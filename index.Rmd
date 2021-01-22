@@ -8,9 +8,87 @@ output: html_document
 
 ```{r}
 library(tidyverse)
+library(corrplot)
 caminho <- "https://raw.githubusercontent.com/arpanosso/ministerio_saude_alimentos/main/dados/alcatra.txt"
 alcatra <- read.table(caminho,h=TRUE,sep="\t")
 glimpse(alcatra)
 ```
 
+# Criando os períodos
 
+Foi adicionada outra variável, período, definida como P1 para anos menores ou iguais que 2011 e P2 para os demais.
+
+```{r}
+alcatra <- alcatra %>% 
+  mutate(periodo = ifelse(Ano <= 2010,"P1","P2"))
+glimpse(alcatra)
+```
+
+
+# Gráfico ao longo do tempo para IPCA e Exportação Bovina
+
+```{r}
+coeff <- 100000000
+alcatra %>%   
+  ggplot(aes(x=Ano)) +
+  geom_line( aes(y=IPCA, color = "IPCA")) + 
+  geom_line( aes(y=ExpBovi  / coeff, color = "ExpBovi")) + 
+  scale_y_continuous(
+    name = "IPCA",
+    sec.axis = sec_axis(~.*coeff, name="ExpBovi")
+  ) +
+  scale_colour_manual(values = c("blue", "red"))+
+  geom_vline(xintercept = c(2011),lty=2)
+```
+
+
+# Análise de correlação
+
+## Para o Período 1
+```{r}
+alcatra %>% 
+  filter(Ano < 2011) %>% 
+  select(-Ano, - periodo) %>% 
+  cor()
+```
+
+## Para o Período 2
+```{r}
+alcatra %>% 
+  filter(Ano >= 2011) %>% 
+  select(-Ano,-periodo) %>% 
+  cor()
+```
+
+# Análise de regressão linear para cada período
+
+```{r}
+alcatra %>% 
+  ggplot(aes(x=ExpBovi, y=IPCA, color=as.factor(periodo))) +
+  geom_point()+
+  geom_smooth(method = "lm")+
+  facet_wrap(~periodo,scales = "free")+
+  labs(color="Períodos")
+```
+
+## Anova para o Periodo 1
+
+A análise de regressão linear foi não significativa pelo teste F ao nível de 5% de probabilidadade (p=0.2751), indicando que não existe uma relação linear entre o IPCA e ExpBovi, denotado pelos baixos valores de R² (0.07704).
+
+```{r}
+da<-alcatra %>% 
+  filter(Ano <= 2011)
+mod <- lm(IPCA~ExpBovi, data=da)
+summary.lm(mod)
+```
+
+## Anova para o Periodo 2
+
+A análise de regressão linear foi significativa pelo teste F ao nível de 5% de probabilidadade (p=0.03073), indicando que existe uma relação linear entre o IPCA e ExpBovi, denotado pelos baixos valores de R² (0.4964).
+
+```{r}
+da<-alcatra %>% 
+  filter(Ano > 2011)
+mod <- lm(IPCA~ExpBovi, data=da)
+summary.lm(mod)
+```
