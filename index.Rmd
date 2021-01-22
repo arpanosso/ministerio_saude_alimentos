@@ -4,5 +4,13 @@ author: "Panosso A.R. & Oliveira J."
 date: "22/01/2021"
 output: html_document
 ---
-# Testes Iniciais
+# Entrada de dados
+
+```{r}
+library(tidyverse)
+caminho <- "https://raw.githubusercontent.com/arpanosso/ministerio_saude_alimentos/main/dados/alcatra.txt"
+alcatra <- read.table(caminho,h=TRUE,sep="\t")
+glimpse(alcatra)
+```
+
 
