@@ -73,7 +73,7 @@ alcatra %>%
 
 ## Anova para o Periodo 1
 
-A análise de regressão linear foi não significativa pelo teste F ao nível de 5% de probabilidadade (p=0.2751), indicando que não existe uma relação linear entre o IPCA e ExpBovi, denotado pelos baixos valores de R² (0.07704).
+A análise de regressão linear foi não significativa pelo teste F ao nível de 5% de probabilidadade (p=0.2751), indicando que não existe uma relação linear entre o IPCA e ExpBovi, denotado pelos baixos valor de R² (0.07704).
 
 ```{r}
 da<-alcatra %>% 
@@ -84,11 +84,80 @@ summary.lm(mod)
 
 ## Anova para o Periodo 2
 
-A análise de regressão linear foi significativa pelo teste F ao nível de 5% de probabilidadade (p=0.03073), indicando que existe uma relação linear entre o IPCA e ExpBovi, denotado pelos baixos valores de R² (0.4964).
+A análise de regressão linear foi significativa pelo teste F ao nível de 5% de probabilidadade (p=0.03073), indicando que existe uma relação linear entre o IPCA e ExpBovi, denotado pelos médios valor de R² (0.4964).
 
 ```{r}
 da<-alcatra %>% 
   filter(Ano > 2011)
 mod <- lm(IPCA~ExpBovi, data=da)
+summary.lm(mod)
+```
+
+
+# Gráfico ao longo do tempo para IPCA e Preço em Reais
+
+```{r}
+coeff <- .5
+alcatra %>%   
+  ggplot(aes(x=Ano)) +
+  geom_line( aes(y=IPCA, color = "IPCA")) + 
+  geom_line( aes(y=pReais  / coeff, color = "Preço em Reais")) + 
+  scale_y_continuous(
+    name = "IPCA",
+    sec.axis = sec_axis(~.*coeff, name="Preço em Reais")
+  ) +
+  scale_colour_manual(values = c("blue", "red"))+
+  geom_vline(xintercept = c(2011),lty=2)
+```
+
+
+# Análise de correlação
+
+## Para o Período 1
+```{r}
+alcatra %>% 
+  filter(Ano < 2011) %>% 
+  select(-Ano, - periodo) %>% 
+  cor()
+```
+
+## Para o Período 2
+```{r}
+alcatra %>% 
+  filter(Ano >= 2011) %>% 
+  select(-Ano,-periodo) %>% 
+  cor()
+```
+
+# Análise de regressão linear para cada período
+
+```{r}
+alcatra %>% 
+  ggplot(aes(x=pReais, y=IPCA, color=as.factor(periodo))) +
+  geom_point()+
+  geom_smooth(method = "lm")+
+  facet_wrap(~periodo,scales = "free")+
+  labs(color="Períodos")
+```
+
+## Anova para o Periodo 1
+
+A análise de regressão linear foi não significativa pelo teste F ao nível de 5% de probabilidadade (p= 0.8714), indicando que não existe uma relação linear entre o IPCA e pReais, denotado pelos baixos valor de R² (0.005774).
+
+```{r}
+da<-alcatra %>% 
+  filter(Ano <= 2011)
+mod <- lm(IPCA~pReais, data=da)
+summary.lm(mod)
+```
+
+## Anova para o Periodo 2
+
+A análise de regressão linear foi significativa pelo teste F ao nível de 5% de probabilidadade (p=0.2252), indicando que existe uma relação linear entre o IPCA e pReais, denotado pelos baixos valor de R² (0.2334).
+
+```{r}
+da<-alcatra %>% 
+  filter(Ano > 2011)
+mod <- lm(IPCA~pReais, data=da)
 summary.lm(mod)
 ```
