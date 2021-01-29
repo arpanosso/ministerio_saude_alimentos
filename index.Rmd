@@ -161,3 +161,54 @@ da<-alcatra %>%
 mod <- lm(IPCA~pReais, data=da)
 summary.lm(mod)
 ```
+
+# Rodada de análise 2
+
+```{r}
+caminho <- "https://raw.githubusercontent.com/arpanosso/ministerio_saude_alimentos/main/dados/rodada2.txt"
+ipca <- read.table(caminho,h=TRUE,sep="\t")
+glimpse(ipca)
+```
+
+```{r}
+coeff <- 1
+ipca %>%   
+  ggplot(aes(x=Ano)) +
+  geom_line( aes(y=IPCA, color = "IPCA")) + 
+  geom_line( aes(y=pExp   / coeff, color = "pExp")) + 
+  scale_y_continuous(
+    name = "IPCA",
+    sec.axis = sec_axis(~.*coeff, name="pExp")
+  ) +
+  scale_colour_manual(values = c("blue", "red"))+
+  geom_vline(xintercept = c(2011),lty=2)
+```
+# Análise de correlação
+
+## Para o Período TOTAL
+```{r}
+ipca %>% 
+  select(-Ano) %>% 
+  cor()
+```
+
+
+# Análise de regressão linear para cada período
+
+```{r,message=FALSE}
+ipca %>% 
+  ggplot(aes(x=pExp, y=IPCA)) +
+  geom_point()+
+  geom_smooth(method = "lm")
+```
+
+## Anova para o Periodo TOTAL
+
+A análise de regressão linear foi  significativa pelo teste F ao nível de 15% de probabilidadade (p= 1.63e-09), indicando que  existe uma relação linear entre o IPCA e pExp, denotado pelos alto valor de R² (0.944).
+
+```{r}
+
+mod <- lm(IPCA~pExp, data=ipca)
+summary.lm(mod)
+```
+
