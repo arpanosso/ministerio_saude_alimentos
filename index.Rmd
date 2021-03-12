@@ -305,3 +305,89 @@ da<-dados
 mod <- lm(IPCA~grao_soja_exp, data=da)
 summary.lm(mod)
 ```
+# Rodada 4
+
+```{r}
+caminho <- "https://raw.githubusercontent.com/arpanosso/ministerio_saude_alimentos/main/dados/rodada3.txt"
+dados <- read.table(caminho,h=TRUE,sep="\t")
+glimpse(dados)
+```
+
+
+# Gráfico ao longo do tempo para IPCA e oleo_soja_exp
+
+```{r}
+coeff <- 1
+dados %>%   
+  ggplot(aes(x=ano)) +
+  geom_line( aes(y=IPCA, color = "IPCA")) + 
+  geom_line( aes(y=oleo_soja_exp  / coeff, color = "oleo_soja_exp")) + 
+  scale_y_continuous(
+    name = "IPCA",
+    sec.axis = sec_axis(~.*coeff, name="oleo_soja_exp")
+  ) +
+  scale_colour_manual(values = c("blue","red"))
+```
+
+# Gráfico ao longo do tempo para IPCA e grao_soja_exp
+
+```{r}
+coeff <- 1
+dados %>%   
+  ggplot(aes(x=ano)) +
+  geom_line( aes(y=IPCA, color = "IPCA")) + 
+  geom_line( aes(y=grao_soja_exp  / coeff, color = "grao_soja_exp")) + 
+  scale_y_continuous(
+    name = "IPCA",
+    sec.axis = sec_axis(~.*coeff, name="grao_soja_exp")
+  ) +
+  scale_colour_manual(values = c("red", "blue"))
+```
+
+
+
+
+# Análise de correlação
+
+```{r}
+dados %>% 
+  select(-ano) %>% 
+  cor()
+```
+# Análise de regressão linear para óleo de soja 
+
+```{r}
+dados %>% 
+  ggplot(aes(x=oleo_soja_exp, y=IPCA)) +
+  geom_point(shape=21, color="black", fill="aquamarine4", size=4)+
+  geom_smooth(aes(x=oleo_soja_exp, y=IPCA),method = "lm",color="red") +
+  theme_classic()+
+  stat_regline_equation(aes(
+  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")))
+```
+
+## Anova para óleos de soja
+
+A análise de regressão linear foi significativa pelo teste F ao nível de 1% de probabilidadade (p=<0.001), indicando que existe uma relação linear entre o IPCA e oleo_soja_exp, denotado pelos altos valor de R² (0.92).
+
+```{r}
+da<-dados
+mod <- lm(IPCA~oleo_soja_exp, data=da)
+summary.lm(mod)
+```
+
+# Análise de regressão linear para grao de soja 
+
+```{r}
+dados %>% 
+  ggplot(aes(x=grao_soja_exp, y=IPCA)) +
+  geom_point(shape=21, color="black", fill="aquamarine4", size=4)+
+  geom_smooth(aes(x=oleo_soja_exp, y=IPCA),method = "lm",color="red") +
+  theme_classic()+
+  stat_regline_equation(aes(
+  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")))
+```
+
+## Anova para grãos de soja
+
+A análise de regressão linear foi significativa pelo teste F ao nível de 1% de probabilidadade (p<0.001), indicando que existe uma relação linear entre o IPCA e grao_soja_exp, denotado pelos altos valor de R² (0.85).
