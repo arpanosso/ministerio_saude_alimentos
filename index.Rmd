@@ -308,42 +308,71 @@ summary.lm(mod)
 # Rodada 4
 
 ```{r}
-caminho <- "https://raw.githubusercontent.com/arpanosso/ministerio_saude_alimentos/main/dados/rodada3.txt"
+caminho <- "https://raw.githubusercontent.com/arpanosso/ministerio_saude_alimentos/main/dados/rodada4.txt"
 dados <- read.table(caminho,h=TRUE,sep="\t")
 glimpse(dados)
 ```
 
 
-# Gráfico ao longo do tempo para IPCA e oleo_soja_exp
+# Gráfico ao longo do tempo para IPCA_cristal e Açúcar refinado Exportação
 
 ```{r}
 coeff <- 1
 dados %>%   
-  ggplot(aes(x=ano)) +
-  geom_line( aes(y=IPCA, color = "IPCA")) + 
-  geom_line( aes(y=oleo_soja_exp  / coeff, color = "oleo_soja_exp")) + 
+  ggplot(aes(x=Ano)) +
+  geom_line( aes(y=IPCA_cristal, color = "IPCA_cristal")) + 
+  geom_line( aes(y=refinadoExp  / coeff, color = "refinado Exportação")) + 
   scale_y_continuous(
     name = "IPCA",
-    sec.axis = sec_axis(~.*coeff, name="oleo_soja_exp")
+    sec.axis = sec_axis(~.*coeff, name="Açúcar refinado exportação")
   ) +
   scale_colour_manual(values = c("blue","red"))
 ```
 
-# Gráfico ao longo do tempo para IPCA e grao_soja_exp
+# Gráfico ao longo do tempo para IPCA_cristal e Açúcar bruto Exportação
 
 ```{r}
 coeff <- 1
 dados %>%   
-  ggplot(aes(x=ano)) +
-  geom_line( aes(y=IPCA, color = "IPCA")) + 
-  geom_line( aes(y=grao_soja_exp  / coeff, color = "grao_soja_exp")) + 
+  ggplot(aes(x=Ano)) +
+  geom_line( aes(y=IPCA_cristal, color = "IPCA_cristal")) + 
+  geom_line( aes(y=brutoExp  / coeff, color = "bruto exportação")) + 
   scale_y_continuous(
     name = "IPCA",
-    sec.axis = sec_axis(~.*coeff, name="grao_soja_exp")
+    sec.axis = sec_axis(~.*coeff, name="Açúcar bruto exportação")
   ) +
   scale_colour_manual(values = c("red", "blue"))
 ```
 
+# Gráfico ao longo do tempo para IPCA_refinado e Açúcar refinado Exportação
+
+```{r}
+coeff <- 1
+dados %>%   
+  ggplot(aes(x=Ano)) +
+  geom_line( aes(y=IPCA_Refinado, color = "IPCA_refinado")) + 
+  geom_line( aes(y=refinadoExp  / coeff, color = "refinado Exportação")) + 
+  scale_y_continuous(
+    name = "IPCA",
+    sec.axis = sec_axis(~.*coeff, name="Açúcar refinado exportação")
+  ) +
+  scale_colour_manual(values = c("blue","red"))
+```
+
+# Gráfico ao longo do tempo para IPCA_refinado e Açúcar bruto Exportação
+
+```{r}
+coeff <- 1
+dados %>%   
+  ggplot(aes(x=Ano)) +
+  geom_line( aes(y=IPCA_Refinado, color = "IPCA_refinado")) + 
+  geom_line( aes(y=brutoExp  / coeff, color = "bruto exportação")) + 
+  scale_y_continuous(
+    name = "IPCA",
+    sec.axis = sec_axis(~.*coeff, name="Açúcar bruto exportação")
+  ) +
+  scale_colour_manual(values = c("red", "blue"))
+```
 
 
 
@@ -351,43 +380,93 @@ dados %>%
 
 ```{r}
 dados %>% 
-  select(-ano) %>% 
+  select(-Ano) %>% 
   cor()
 ```
-# Análise de regressão linear para óleo de soja 
+# Análise de regressão linear para açúcar refinado exportação e IPCA_cristal 
 
 ```{r}
 dados %>% 
-  ggplot(aes(x=oleo_soja_exp, y=IPCA)) +
+  ggplot(aes(x=refinadoExp, y=IPCA_cristal)) +
   geom_point(shape=21, color="black", fill="aquamarine4", size=4)+
-  geom_smooth(aes(x=oleo_soja_exp, y=IPCA),method = "lm",color="red") +
+  geom_smooth(aes(x=refinadoExp, y=IPCA_cristal),method = "lm",color="red") +
   theme_classic()+
   stat_regline_equation(aes(
   label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")))
 ```
 
-## Anova para óleos de soja
+## Anova para açúcar refinado exportação e IPCA_cristal
 
-A análise de regressão linear foi significativa pelo teste F ao nível de 1% de probabilidadade (p=<0.001), indicando que existe uma relação linear entre o IPCA e oleo_soja_exp, denotado pelos altos valor de R² (0.92).
+A análise de regressão linear foi significativa pelo teste F ao nível de 1% de probabilidadade (p=<0.001), indicando que existe uma relação linear entre o IPCA_cristal e refinadoExp, denotado pelos altos valor de R² (0.89).
 
 ```{r}
 da<-dados
-mod <- lm(IPCA~oleo_soja_exp, data=da)
+mod <- lm(IPCA_cristal~refinadoExp, data=da)
 summary.lm(mod)
 ```
 
-# Análise de regressão linear para grao de soja 
+# Análise de regressão linear açúcar bruto e IPCA_cristal
 
 ```{r}
 dados %>% 
-  ggplot(aes(x=grao_soja_exp, y=IPCA)) +
+  ggplot(aes(x=brutoExp, y=IPCA_cristal)) +
   geom_point(shape=21, color="black", fill="aquamarine4", size=4)+
-  geom_smooth(aes(x=oleo_soja_exp, y=IPCA),method = "lm",color="red") +
+  geom_smooth(aes(x=brutoExp, y=IPCA_cristal),method = "lm",color="red") +
   theme_classic()+
   stat_regline_equation(aes(
   label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")))
 ```
 
-## Anova para grãos de soja
+## Anova para açúcar bruto exportação e IPCA_cristal
 
-A análise de regressão linear foi significativa pelo teste F ao nível de 1% de probabilidadade (p<0.001), indicando que existe uma relação linear entre o IPCA e grao_soja_exp, denotado pelos altos valor de R² (0.85).
+A análise de regressão linear foi significativa pelo teste F ao nível de 1% de probabilidadade (p=<0.001), indicando que existe uma relação linear entre o IPCA_cristal e brutoExp, denotado pelos altos valor de R² (0.90).
+
+```{r}
+da<-dados
+mod <- lm(IPCA_cristal~brutoExp, data=da)
+summary.lm(mod)
+```
+
+# Análise de regressão linear para açúcar refinado exportação e IPCA_refinado 
+
+```{r}
+dados %>% 
+  ggplot(aes(x=refinadoExp, y=IPCA_Refinado)) +
+  geom_point(shape=21, color="black", fill="aquamarine4", size=4)+
+  geom_smooth(aes(x=refinadoExp, y=IPCA_Refinado),method = "lm",color="red") +
+  theme_classic()+
+  stat_regline_equation(aes(
+  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")))
+```
+
+## Anova para açúcar refinado exportação e IPCA_refinado
+
+A análise de regressão linear foi significativa pelo teste F ao nível de 1% de probabilidadade (p=<0.001), indicando que existe uma relação linear entre o IPCA_refinado e refinadoExp, denotado pelos altos valor de R² (0.92).
+
+```{r}
+da<-dados
+mod <- lm(IPCA_Refinado~refinadoExp, data=da)
+summary.lm(mod)
+```
+
+# Análise de regressão linear açúcar bruto e IPCA_refinado
+
+```{r}
+dados %>% 
+  ggplot(aes(x=brutoExp, y=IPCA_Refinado)) +
+  geom_point(shape=21, color="black", fill="aquamarine4", size=4)+
+  geom_smooth(aes(x=brutoExp, y=IPCA_Refinado),method = "lm",color="red") +
+  theme_classic()+
+  stat_regline_equation(aes(
+  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")))
+```
+
+## Anova para açúcar bruto exportação e IPCA_cristal
+
+A análise de regressão linear foi significativa pelo teste F ao nível de 1% de probabilidadade (p=<0.001), indicando que existe uma relação linear entre o IPCA_refinado e brutoExp, denotado pelos altos valor de R² (0.92).
+
+```{r}
+da<-dados
+mod <- lm(IPCA_Refinado~brutoExp, data=da)
+summary.lm(mod)
+```
