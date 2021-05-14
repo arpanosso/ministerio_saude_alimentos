@@ -416,3 +416,183 @@ da<-dados
 mod <- lm(IPCA~precoExp, data=da)
 summary.lm(mod)
 ```
+#A Café
+
+```{r}
+caminho <- "https://raw.githubusercontent.com/arpanosso/ministerio_saude_alimentos/main/dados/cafe_porco.txt"
+dados <- read.table(caminho,h=TRUE,sep="\t")
+glimpse(dados)
+```
+
+
+# Gráfico ao longo do tempo para IPCA e Café Soluvel
+
+```{r}
+coeff <- 1
+dados %>%   
+  ggplot(aes(x=Ano)) +
+  geom_line( aes(y=cafe_IPCA, color = "IPCA")) + 
+  geom_line( aes(y=cafe_soluvel  / coeff, color = "Café Solúvel")) + 
+  scale_y_continuous(
+    name = "IPCA",
+    sec.axis = sec_axis(~.*coeff, name="Café solúvel")
+  ) +
+  scale_colour_manual(values = c("blue","red"))
+```
+
+
+
+# Análise de correlação
+
+```{r}
+dados %>% 
+  select(-Ano) %>% 
+  cor()
+```
+# Análise de regressão linear para Cafe Soluvel e IPCA 
+
+```{r}
+dados %>% 
+  ggplot(aes(x=cafe_soluvel, y=cafe_IPCA)) +
+  geom_point(shape=21, color="black", fill="aquamarine4", size=4)+
+  geom_smooth(aes(x=cafe_soluvel, y=cafe_IPCA),method = "lm",color="red") +
+  theme_classic()+
+  stat_regline_equation(aes(
+  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")))
+```
+
+## Anova para Cafe Soluvel e IPCA
+
+A análise de regressão linear foi significativa pelo teste F ao nível de 1% de probabilidadade (p=<0.001), indicando que existe uma relação linear entre o IPCA e Avicultura Exportação, denotado pelos altos valor de R² (0.95).
+
+```{r}
+da<-dados
+mod <- lm(cafe_IPCA~cafe_soluvel, data=da)
+summary.lm(mod)
+```
+
+# Gráfico ao longo do tempo para IPCA e Café Torrado
+
+```{r}
+coeff <- 1
+dados %>%   
+  ggplot(aes(x=Ano)) +
+  geom_line( aes(y=cafe_IPCA, color = "IPCA")) + 
+  geom_line( aes(y=cafe_torrado  / coeff, color = "Café Torrado")) + 
+  scale_y_continuous(
+    name = "IPCA",
+    sec.axis = sec_axis(~.*coeff, name="Café Torrado")
+  ) +
+  scale_colour_manual(values = c("blue","red"))
+```
+
+
+
+# Análise de correlação
+
+```{r}
+dados %>% 
+  select(-Ano) %>% 
+  cor()
+```
+# Análise de regressão linear para Cafe Torrado e IPCA 
+
+```{r}
+dados %>% 
+  ggplot(aes(x=cafe_torrado, y=cafe_IPCA)) +
+  geom_point(shape=21, color="black", fill="aquamarine4", size=4)+
+  geom_smooth(aes(x=cafe_torrado, y=cafe_IPCA),method = "lm",color="red") +
+  theme_classic()+
+  stat_regline_equation(aes(
+  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")))
+```
+
+## Anova para Cafe Torrado e IPCA
+
+A análise de regressão linear foi significativa pelo teste F ao nível de 1% de probabilidadade (p=<0.001), indicando que existe uma relação linear entre o IPCA e Avicultura Exportação, denotado pelos altos valor de R² (0.94).
+
+```{r}
+da<-dados
+mod <- lm(cafe_IPCA~cafe_torrado, data=da)
+summary.lm(mod)
+```
+#Análise para Carne de Porco
+
+# Gráfico ao longo do tempo para IPCA e Carne Suina
+
+```{r}
+coeff <- 1
+dados %>%   
+  ggplot(aes(x=Ano)) +
+  geom_line( aes(y=carne_porco_IPCA, color = "IPCA")) + 
+  geom_line( aes(y=carne_suina  / coeff, color = "Carne Suina")) + 
+  scale_y_continuous(
+    name = "IPCA",
+    sec.axis = sec_axis(~.*coeff, name="Carne Suina")
+  ) +
+  scale_colour_manual(values = c("blue","red"))
+```
+
+
+
+# Análise de regressão linear para Carne Suína e IPCA 
+
+```{r}
+dados %>% 
+  ggplot(aes(x=carne_suina, y=carne_porco_IPCA)) +
+  geom_point(shape=21, color="black", fill="aquamarine4", size=4)+
+  geom_smooth(aes(x=carne_suina, y=carne_porco_IPCA),method = "lm",color="red") +
+  theme_classic()+
+  stat_regline_equation(aes(
+  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")))
+```
+
+## Anova para Carne de porco e IPCA
+
+A análise de regressão linear foi significativa pelo teste F ao nível de 1% de probabilidadade (p=<0.001), indicando que existe uma relação linear entre o IPCA e Avicultura Exportação, denotado pelos altos valor de R² (0.95).
+
+```{r}
+da<-dados
+mod <- lm(carne_porco_IPCA~carne_suina, data=da)
+summary.lm(mod)
+```
+
+# Gráfico ao longo do tempo para IPCA e Miúdos Suínos
+
+```{r}
+coeff <- 1
+dados %>%   
+  ggplot(aes(x=Ano)) +
+  geom_line( aes(y=carne_porco_IPCA, color = "IPCA")) + 
+  geom_line( aes(y=miudos  / coeff, color = "Miudos Porco")) + 
+  scale_y_continuous(
+    name = "IPCA",
+    sec.axis = sec_axis(~.*coeff, name="Miudos Porco")
+  ) +
+  scale_colour_manual(values = c("blue","red"))
+```
+
+
+
+
+# Análise de regressão linear para Miúdos Suínos Torrado e IPCA 
+
+```{r}
+dados %>% 
+  ggplot(aes(x=miudos, y=carne_porco_IPCA)) +
+  geom_point(shape=21, color="black", fill="aquamarine4", size=4)+
+  geom_smooth(aes(x=miudos, y=carne_porco_IPCA),method = "lm",color="red") +
+  theme_classic()+
+  stat_regline_equation(aes(
+  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")))
+```
+
+## Anova para Miúdos Suínos e IPCA
+
+A análise de regressão linear foi significativa pelo teste F ao nível de 1% de probabilidadade (p=<0.001), indicando que existe uma relação linear entre o IPCA e Avicultura Exportação, denotado pelos altos valor de R² (0.90).
+
+```{r}
+da<-dados
+mod <- lm(carne_porco_IPCA~miudos, data=da)
+summary.lm(mod)
+```
