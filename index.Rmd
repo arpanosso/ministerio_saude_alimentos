@@ -416,7 +416,7 @@ da<-dados
 mod <- lm(IPCA~precoExp, data=da)
 summary.lm(mod)
 ```
-#A Café
+# Análise Café
 
 ```{r}
 caminho <- "https://raw.githubusercontent.com/arpanosso/ministerio_saude_alimentos/main/dados/cafe_porco.txt"
@@ -595,4 +595,110 @@ A análise de regressão linear foi significativa pelo teste F ao nível de 1% d
 da<-dados
 mod <- lm(carne_porco_IPCA~miudos, data=da)
 summary.lm(mod)
+```
+
+
+# Análise Limão
+
+```{r}
+caminho <- "https://raw.githubusercontent.com/arpanosso/ministerio_saude_alimentos/main/dados/limao_milho.txt"
+dados <- read.table(caminho,h=TRUE,sep="\t")
+glimpse(dados)
+```
+
+
+# Gráfico ao longo do tempo para IPCA e Limão
+
+```{r}
+coeff <- 1
+dados %>%   
+  ggplot(aes(x=ano)) +
+  geom_line( aes(y=limao_IPCA, color = "IPCA")) + 
+  geom_line( aes(y=limao_exp   / coeff, color = "limao_exp ")) + 
+  scale_y_continuous(
+    name = "IPCA",
+    sec.axis = sec_axis(~.*coeff, name="limao_exp ")
+  ) +
+  scale_colour_manual(values = c("blue","red"))
+```
+
+
+
+# Análise de correlação
+
+```{r}
+dados  |>  
+  select(-ano)  |>  
+  cor()
+```
+# Análise de regressão linear para Limão  e IPCA 
+
+```{r}
+dados %>% 
+  ggplot(aes(x=limao_exp , y=limao_IPCA)) +
+  geom_point(shape=21, color="black", fill="aquamarine4", size=4)+
+  geom_smooth(aes(x=limao_exp, y=limao_IPCA),method = "lm",color="red") +
+  theme_classic()+
+  stat_regline_equation(aes(
+  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")))
+```
+
+## Anova para Cafe Soluvel e IPCA
+
+A análise de regressão linear foi significativa pelo teste F ao nível de 1% de probabilidadade (p=<0.001), indicando que existe uma relação linear entre o IPCA e Avicultura Exportação, denotado pelos altos valor de R² (0.5961).
+
+```{r}
+dados |> 
+  { \(d) lm(limao_IPCA~limao_exp, data=d)}() |> 
+  summary.lm()
+```
+
+# Análise Milho
+
+
+# Gráfico ao longo do tempo para IPCA e Milho
+
+```{r}
+coeff <- 1
+dados %>%   
+  ggplot(aes(x=ano)) +
+  geom_line( aes(y=fuba_IPCA, color = "IPCA")) + 
+  geom_line( aes(y=farinha_milho_exp   / coeff, color = "farinha_milho_exp")) + 
+  scale_y_continuous(
+    name = "IPCA",
+    sec.axis = sec_axis(~.*coeff, name="farinha_milho_exp")
+  ) +
+  scale_colour_manual(values = c("blue","red"))
+```
+
+
+
+# Análise de correlação
+
+```{r}
+dados  |>  
+  select(-ano)  |>  
+  cor()
+```
+
+# Análise de regressão linear para Milho e IPCA 
+
+```{r}
+dados %>% 
+  ggplot(aes(x=farinha_milho_exp , y=fuba_IPCA)) +
+  geom_point(shape=21, color="black", fill="aquamarine4", size=4)+
+  geom_smooth(aes(x=farinha_milho_exp, y=fuba_IPCA),method = "lm",color="red") +
+  theme_classic()+
+  stat_regline_equation(aes(
+  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")))
+```
+
+## Anova para Cafe Soluvel e IPCA
+
+A análise de regressão linear foi significativa pelo teste F ao nível de 1% de probabilidadade (p=<0.001), indicando que existe uma relação linear entre o IPCA e Avicultura Exportação, denotado pelos altos valor de R² (0.8155).
+
+```{r}
+dados |> 
+  { \(d) lm(fuba_IPCA~farinha_milho_exp, data=d)}() |> 
+  summary.lm()
 ```
