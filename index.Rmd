@@ -702,3 +702,61 @@ dados |>
   { \(d) lm(fuba_IPCA~farinha_milho_exp, data=d)}() |> 
   summary.lm()
 ```
+
+
+
+# Análise Laranja
+
+```{r}
+caminho <- "https://raw.githubusercontent.com/arpanosso/ministerio_saude_alimentos/main/dados/laranja.txt"
+dados <- read.table(caminho,h=TRUE,sep="\t")
+glimpse(dados)
+```
+
+
+# Gráfico ao longo do tempo para IPCA e Laranja
+
+```{r}
+coeff <- 1
+dados %>%   
+  ggplot(aes(x=ano)) +
+  geom_line( aes(y=laranja_IPCA, color = "IPCA")) + 
+  geom_line( aes(y=laranja_exp   / coeff, color = "laranja_exp ")) + 
+  scale_y_continuous(
+    name = "IPCA",
+    sec.axis = sec_axis(~.*coeff, name="laranja_exp ")
+  ) +
+  scale_colour_manual(values = c("blue","red"))
+```
+
+
+
+# Análise de correlação
+
+```{r}
+dados  |>  
+  select(-ano)  |>  
+  cor()
+```
+# Análise de regressão linear para Limão  e IPCA 
+
+```{r}
+dados %>% 
+  ggplot(aes(x=laranja_exp , y=laranja_IPCA)) +
+  geom_point(shape=21, color="black", fill="aquamarine4", size=4)+
+  geom_smooth(aes(x=laranja_exp, y=laranja_IPCA),method = "lm",color="red") +
+  theme_classic()+
+  stat_regline_equation(aes(
+  label =  paste(..eq.label.., ..rr.label.., sep = "*plain(\",\")~~")))
+```
+
+## Anova para Cafe Soluvel e IPCA
+
+A análise de regressão linear foi significativa pelo teste F ao nível de 1% de probabilidadade (p=<0.001), indicando que existe uma relação linear entre o IPCA e Avicultura Exportação, denotado pelos altos valor de R² (0.75).
+
+```{r}
+dados |> 
+  { \(d) lm(laranja_IPCA~laranja_exp, data=d)}() |> 
+  summary.lm()
+```
+
