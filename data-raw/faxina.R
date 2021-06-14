@@ -20,6 +20,17 @@ ipca |>
   ggplot2::facet_wrap(~Process.) +
   ggplot2::theme_minimal()
   
+ipca <- ipca |> 
+  tidyr::pivot_longer(
+    cols = dplyr::starts_with("0"),
+    names_to = "data",
+    values_to = "var_ipca"
+  ) |> 
+  dplyr::mutate(
+    data=lubridate::dmy(stringr::str_remove_all(data,"_"))
+  )
+readr::write_rds(ipca, "data/ipca.rds")
+
 # para cada gráfico, 
 # uma estatistica descritiva - média móvel
 # Análise de correlação
