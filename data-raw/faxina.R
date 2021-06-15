@@ -3,7 +3,10 @@
 ipca<-readxl::read_excel("data-raw/IPCA MENSAL 2007-2019.xlsx")
 dplyr::glimpse(ipca)
 
+
+
 ipca |> 
+  dplyr::mutate(Cadeia = if_else(Cadeia == "Suinoculltura","Suinocultura",Cadeia) ) |>
   tidyr::pivot_longer(
     cols = dplyr::starts_with("0"),
     names_to = "data",
@@ -21,6 +24,9 @@ ipca |>
   ggplot2::theme_minimal()
   
 ipca <- ipca |> 
+  dplyr::mutate(
+    Cadeia = if_else(Cadeia == "Suinoculltura","Suinocultura",Cadeia) 
+    ) |>
   tidyr::pivot_longer(
     cols = dplyr::starts_with("0"),
     names_to = "data",

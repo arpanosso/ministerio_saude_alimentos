@@ -47,8 +47,7 @@ ui <- dashboardPage(
                                label = "Selecione um ou mais alimentos",
                                choices = "Carregando...",
                                selected = NULL,
-                               multiple = TRUE,
-                               options = NULL)
+                               multiple = TRUE)
               ),
               column(
                 width = 4,
@@ -67,6 +66,20 @@ ui <- dashboardPage(
             solidHeader = TRUE, 
             status = "primary",  
             plotOutput("serie_ipca") #, height = "200px") # controla a altura do box
+            ),
+          box(
+            width = 6,
+            title = "Correlação - 2007 a 2011",
+            solidHeader = TRUE, 
+            status = "primary",  
+            plotOutput("corrplot_1")
+          ),
+          box(
+            width = 6,
+            title = "Correlação - 2012 a 2020",
+            solidHeader = TRUE, 
+            status = "primary",  
+            plotOutput("corrplot_2")
           )
         )
       )
@@ -100,27 +113,52 @@ server <- function(input, output, session) {
     updateSelectInput(
       session,
       "alimento",
-      choices = c("Todos",alimentos),
-      selected = "Todos"
+      choices = alimentos,
+      selected = alimentos[1]
     )
   })
   
   output$serie_ipca <- renderPlot({
-    if(is.null(input$alimento)) {
-      Ali = ""
-    } else{
-      Ali = input$alimento
-    }
-    
+    # browser()
+    # if(input$alimento == "Todos" | is.null(input$alimento) ) {
+    #    Ali <- ipca |> filter( Cadeia == input$cadeia) |> pull(Alimento) |> unique() |> sort()
+    # } else {
+    #   Ali <- input$alimento
+    # }
     ipca |> 
       # browser() |> 
       filter( Cadeia == input$cadeia) |> 
-      # filter(Ali %in% Alimento) |> 
-      ggplot(aes(x=data, y=var_ipca, color=Ali)) +
+      filter(Alimento %in% input$alimento) |> 
+      filter(Process. %in% input$processo) |> 
+      ggplot(aes(x=data, y=var_ipca, color=Alimento)) +
       geom_line()+
-      theme_minimal()
+      theme_minimal()+
+      theme(legend.position = "bottom")
   })
   
+  output$corrplot_1 <- renderPlot({
+    ipca |> filter(Cadeia == input$cadeia,data <= as.Date("2011-12-31")) |> 
+      tidyr::drop_na() |> 
+      tidyr::pivot_wider(id_cols = data,
+                         names_from =Alimento,
+                         values_from = var_ipca
+                        ) |> 
+      select(-data) |> 
+      cor() |> 
+      corrplot::corrplot(method = "ellipse", type = "upper")
+  })
+  
+  output$corrplot_2 <- renderPlot({
+    ipca |> filter(Cadeia == input$cadeia,data > as.Date("2011-12-31")) |>
+      tidyr::drop_na() |> 
+      tidyr::pivot_wider(id_cols = data,
+                         names_from =Alimento,
+                         values_from = var_ipca
+      ) |> 
+      select(-data) |> 
+      cor() |> 
+      corrplot::corrplot(method = "ellipse", type = "upper")
+  })
 }
 
 shinyApp(ui, server)
