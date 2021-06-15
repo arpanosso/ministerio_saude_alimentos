@@ -37,9 +37,7 @@ ipca <- ipca |>
   )
 readr::write_rds(ipca, "data/ipca.rds")
 
-# para cada gráfico, 
 # uma estatistica descritiva - média móvel
-# Análise de correlação
 # Análise de correlograma em pares
 
 

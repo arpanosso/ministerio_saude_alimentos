@@ -38,11 +38,6 @@ ui <- dashboardPage(
               ),
               column(
                 width = 4,
-                # selectInput(
-                #   inputId = "alimento",
-                #   label = "Selecione o alimento",
-                #   choices = "Carregando..."
-                # )
                 selectizeInput(inputId = "alimento",
                                label = "Selecione um ou mais alimentos",
                                choices = "Carregando...",
@@ -65,7 +60,7 @@ ui <- dashboardPage(
             title = "Série Temporal - Variação do IPCA",
             solidHeader = TRUE, 
             status = "primary",  
-            plotOutput("serie_ipca") #, height = "200px") # controla a altura do box
+            plotOutput("serie_ipca", height = "200px") # controla a altura do box
             ),
           box(
             width = 6,
@@ -80,6 +75,15 @@ ui <- dashboardPage(
             solidHeader = TRUE, 
             status = "primary",  
             plotOutput("corrplot_2")
+          )
+        ),
+        fluidRow(
+          box(
+            width = 12,
+            title = "Estatística Descritiva",
+            solidHeader = TRUE, 
+            status = "primary",  
+            tableOutput("estadesc")
           )
         )
       )
@@ -119,15 +123,8 @@ server <- function(input, output, session) {
   })
   
   output$serie_ipca <- renderPlot({
-    # browser()
-    # if(input$alimento == "Todos" | is.null(input$alimento) ) {
-    #    Ali <- ipca |> filter( Cadeia == input$cadeia) |> pull(Alimento) |> unique() |> sort()
-    # } else {
-    #   Ali <- input$alimento
-    # }
     ipca |> 
-      # browser() |> 
-      filter( Cadeia == input$cadeia) |> 
+      filter(Cadeia == input$cadeia) |> 
       filter(Alimento %in% input$alimento) |> 
       filter(Process. %in% input$processo) |> 
       ggplot(aes(x=data, y=var_ipca, color=Alimento)) +
@@ -153,11 +150,43 @@ server <- function(input, output, session) {
       tidyr::drop_na() |> 
       tidyr::pivot_wider(id_cols = data,
                          names_from =Alimento,
-                         values_from = var_ipca
-      ) |> 
+                         values_from = var_ipca) |> 
       select(-data) |> 
       cor() |> 
       corrplot::corrplot(method = "ellipse", type = "upper")
+  })
+  
+  output$estadesc <- renderTable({
+      est<-function(x) {
+        na=sum(is.na(x))
+        x <-na.omit(x)
+        c(media=mean(x),
+          dp=sd(x),
+          Na = na,
+          minimo = min(x),
+          mediana = median(x),
+          maximo = max(x),
+          assimetria = agricolae::skewness(x),
+          curtose = agricolae::kurtosis(x))
+      }
+    
+      tab <- ipca |> filter(Cadeia == input$cadeia) |>
+      tidyr::pivot_wider(id_cols = data,
+                         names_from =Alimento,
+                         values_from = var_ipca) |> 
+      select(-data) |> 
+      summarise(
+        across(.cols = is.numeric,
+               .fns = est)) |>
+      t() 
+      
+      colnames(tab) <- c("Média","Desv_Pad","Nas","Mínimo","Mediana","Maximo",
+                         "Assimetria","Curtose")
+      nomes_r <- row.names(tab)
+      tab <- as.tibble(tab)
+      tab$Alimento <- nomes_r
+      tab |> 
+        relocate(Alimento)
   })
 }
 
