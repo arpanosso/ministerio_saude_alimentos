@@ -7,7 +7,7 @@ library(plotly)
 
 ipca <- readr::read_rds("data/ipca.rds")
 
-ui <- dashboardPage(
+ui <- dashboardPage(skin = "green",
   header = dashboardHeader(title = "Preço de Alimentos"),
   sidebar = dashboardSidebar(
     sidebarMenu(
@@ -18,12 +18,13 @@ ui <- dashboardPage(
     )
   ),
   body = dashboardBody(
+    tags$link(
+      rel = "stylesheet",
+      type = "text/css",
+      href = "custom.css"
+    ),
     tabItems(
-      
-
 # ui visualização ---------------------------------------------------------
-
-    
       tabItem(
         tabName = "vasualizacao",
         fluidRow(
@@ -71,7 +72,7 @@ ui <- dashboardPage(
             title = "Série Temporal - Variação do IPCA",
             solidHeader = TRUE, 
             status = "primary",  
-            plotOutput("serie_ipca", height = "200px") # controla a altura do box
+            plotOutput("serie_ipca") # controla a altura do box
           ),
           box(
             width = 6,
@@ -131,14 +132,16 @@ ui <- dashboardPage(
                   options = NULL
                 )
               ),
-              column(
-                width = 6,
-                checkboxGroupInput(
-                  inputId = "processo_mult",
-                  label = "Tipo de Processamento",
-                  choices = c("G1","G2","G3","G4"),
-                  selected = c("G1","G2","G3","G4"),
-                  inline = TRUE
+              fluidRow(
+                column(
+                  width = 6,
+                  checkboxGroupInput(
+                    inputId = "processo_mult",
+                    label = "Tipo de Processamento",
+                    choices = c("G1","G2","G3","G4"),
+                    selected = c("G1","G2","G3","G4"),
+                    inline = TRUE
+                  )
                 )
               )
             ),
@@ -174,7 +177,9 @@ ui <- dashboardPage(
                 )
               )
             )
-          ),
+          )
+        ),
+        fluidRow(
           box(
             width = 6,
             title = "Biplot",

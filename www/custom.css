@@ -1,0 +1,13 @@
+.input-group-sm > .form-control, .input-group-sm > .input-group-addon, .input-group-sm > .input-group-btn > .btn {
+    height: 30px;
+    padding: 5px 10px;
+    font-size: 18px;
+    line-height: 1.5;
+    border-radius: 3px;
+}
+
+.box.box-solid.box-primary > .box-header {
+    color: #fff;
+    background: #74d571;
+        background-color: rgb(116, 213, 113);
+    background-color: #5b9956;

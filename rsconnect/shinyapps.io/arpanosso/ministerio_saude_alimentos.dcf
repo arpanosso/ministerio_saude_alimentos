@@ -5,10 +5,10 @@ account: arpanosso
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 4271911
-bundleId: 4757709
+bundleId: 4758147
 url: https://arpanosso.shinyapps.io/ministerio_saude_alimentos/
-when: 1624657586.68039
-lastSyncTime: 1624657586.68039
+when: 1624672203.70479
+lastSyncTime: 1624672203.70479
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: avicultura.txt|bovinocultura.txt|data-raw/IPCA MENSAL 2007-2019.xlsx|index.html|index.Rmd|LICENSE|README.md|dados
