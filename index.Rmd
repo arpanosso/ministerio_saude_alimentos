@@ -760,3 +760,52 @@ dados |>
   summary.lm()
 ```
 
+## Correlação entre países (série toda).
+```{r}
+library(readxl)
+serie_grau <- read_excel("data/Séries por grau de processamento(2)(1).xlsx") |> 
+  dplyr::mutate(ano = lubridate::year(Mês))
+```
+
+```{r}
+grupos <- serie_grau$Grupo |> unique()
+vars<-names(serie_grau[4:6])
+saida<-vector()
+for(i in seq_along(grupos)){
+  for(j in seq_along(vars)){
+    da <- serie_grau |> 
+      dplyr::filter(Grupo == grupos[i]) |> 
+      dplyr::select(Brasil,vars[j])
+    obj <- cor.test(da$Brasil,da |> dplyr::pull(vars[j]) )
+    r<-obj$estimate
+    p<-obj$p.value
+   saida <- rbind(saida,c(grupo = grupos[i],Pais = vars[j], r = r |> round(5)
+                  ,P = p |> round(5)))
+  }
+}
+writexl::write_xlsx(saida |> as.data.frame(),"data/saida_serie_total.xlsx" )
+```
+
+## Correlação entre países (por ano).
+
+```{r}
+grupos <- serie_grau$Grupo |> unique()
+vars<-names(serie_grau[4:6])
+saida<-vector()
+for(i in seq_along(grupos)){
+  for(j in seq_along(vars)){
+    for(k in 2020:2021){
+      da <- serie_grau |> 
+        dplyr::filter(Grupo == grupos[i], ano == k) |> 
+        dplyr::select(Brasil,vars[j])
+      obj <- cor.test(da$Brasil,da |> dplyr::pull(vars[j]) )
+      r<-obj$estimate
+      p<-obj$p.value
+     saida <- rbind(saida,c(ano = k,grupo = grupos[i],Pais = vars[j], r = r |> round(5)
+                    ,P = p |> round(5)))
+    }
+  }
+}
+tibble::as.tibble( saida ) |>  dplyr::arrange(ano)
+writexl::write_xlsx(saida |>  as.data.frame(),"data/saida_ano.xlsx" )
+```
